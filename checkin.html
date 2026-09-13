@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>打卡图生成器 · 112→106</title>
+<title>打卡图生成器 · 112→107</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#15181c;color:#e6edf3;font:14px/1.6 "PingFang SC","Microsoft YaHei",system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;padding:22px 16px 40px;gap:16px}
@@ -41,7 +41,7 @@ body.pure .out{display:none}
 <script>
 var cv = document.getElementById('cv');
 var ctx = cv.getContext('2d');
-var W = 1080, H = 1920, START = 112, GOAL = 106;
+var W = 1080, H = 1920, START = 112, GOAL = 107;
 var dayEl = document.getElementById('day');
 var kgEl = document.getElementById('kg');
 
@@ -63,7 +63,7 @@ function draw(){
 
   ctx.textAlign = 'center';
   ctx.fillStyle = '#5C7A6B'; ctx.font = font(30, 600);
-  ctx.fillText('28 天公开打卡 · 112 → 106 斤', 540, 142);
+  ctx.fillText('28 天公开打卡 · 112 → 107 斤', 540, 142);
 
   ctx.fillStyle = '#7EE787'; ctx.font = font(34, 700);
   ctx.fillText('D A Y', 540, 268);
@@ -99,11 +99,11 @@ function draw(){
   ctx.fillText((lost > 0 ? '-' : '+') + Math.abs(lost).toFixed(1) + ' 斤', bx + 72, by - 34);
   ctx.textAlign = 'right';
   ctx.fillStyle = '#8B949E'; ctx.font = font(29, 600);
-  ctx.fillText('距 106 斤还差 ' + Math.max(0, total - lost).toFixed(1) + ' 斤', bx + bw, by - 34);
+  ctx.fillText('距 107 斤还差 ' + Math.max(0, total - lost).toFixed(1) + ' 斤', bx + bw, by - 34);
   ctx.textAlign = 'center';
 
-  var items = ['控住饮食，没碰糖饮', '喝水 2L', '快走 20 分钟', '睡够 7 小时'];
-  var y = 1240;
+  var items = ['4:00 吃药，空腹到 8 点', '控住饮食，没碰糖饮', '喝水 2L', '快走 20 分钟', '睡够 7 小时'];
+  var y = 1205;
   for (var i = 0; i < items.length; i++){
     ctx.fillStyle = '#111A16'; rr(140, y - 40, 800, 86, 14); ctx.fill();
     ctx.strokeStyle = '#25382D'; ctx.lineWidth = 2; rr(140, y - 40, 800, 86, 14); ctx.stroke();
@@ -111,13 +111,13 @@ function draw(){
     ctx.fillStyle = '#C9D1D9'; ctx.font = font(36, 500); ctx.textAlign = 'left';
     ctx.fillText(items[i], 262, y + 12);
     ctx.textAlign = 'center';
-    y += 106;
+    y += 102;
   }
 
   ctx.fillStyle = '#7EE787'; ctx.font = font(40, 700);
   ctx.fillText('今天也没有放弃', 540, 1766);
   ctx.fillStyle = '#4A5560'; ctx.font = font(27);
-  ctx.fillText('#减脂打卡  #112到106  #每天记录', 540, 1836);
+  ctx.fillText('#减脂打卡  #112到107  #每天记录', 540, 1836);
 }
 
 var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
