@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>打卡图生成器 · 112→106</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#15181c;color:#e6edf3;font:14px/1.6 "PingFang SC","Microsoft YaHei",system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;padding:22px 16px 40px;gap:16px}
+.panel{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;background:#1e2329;border:1px solid #2c333b;padding:16px 20px;border-radius:14px;max-width:100%}
+label{display:flex;flex-direction:column;gap:6px;font-size:12px;color:#8b949e;letter-spacing:.5px}
+input{width:132px;padding:9px 11px;border-radius:9px;border:1px solid #39424c;background:#12161a;color:#e6edf3;font-size:16px}
+input:focus{outline:none;border-color:#3FB950}
+button{padding:11px 22px;border-radius:9px;border:0;background:#3FB950;color:#04140a;font-weight:800;font-size:14.5px;cursor:pointer}
+button.ghost{background:#2c333b;color:#c9d1d9;font-weight:600}
+canvas{width:min(94vw,430px);height:auto;border-radius:14px;box-shadow:0 14px 44px rgba(0,0,0,.55)}
+.hint{font-size:12.5px;color:#6e7b87;max-width:560px;text-align:center;line-height:1.8}
+body.pure{background:#000;padding:0;gap:0}
+body.pure .panel,body.pure .hint{display:none}
+body.pure canvas{width:1080px;height:1920px;border-radius:0;box-shadow:none}
+</style>
+</head>
+<body>
+<div class="panel">
+  <label>第几天（1-28）<input id="day" type="number" min="1" max="28" value="1"></label>
+  <label>今晨体重（斤）<input id="kg" type="number" step="0.1" value="112"></label>
+  <button id="dl">下载图片</button>
+  <button id="clr" class="ghost">重置</button>
+</div>
+<canvas id="cv" width="1080" height="1920"></canvas>
+<p class="hint">填好数字 → 点「下载图片」→ 得到 1080×1920 的 PNG → 抖音发图文时选它。<br>数字会自动记住，第二天打开只需改一下体重。</p>
+<script>
+var cv = document.getElementById('cv');
+var ctx = cv.getContext('2d');
+var W = 1080, H = 1920, START = 112, GOAL = 106;
+var dayEl = document.getElementById('day');
+var kgEl = document.getElementById('kg');
+
+function font(size, weight){ return (weight || 400) + ' ' + size + 'px "PingFang SC","Microsoft YaHei",system-ui,sans-serif'; }
+function rr(x, y, w, h, r){ ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function p2(n){ return n < 10 ? '0' + n : '' + n; }
+
+function draw(){
+  var day = Math.max(1, Math.min(28, parseInt(dayEl.value, 10) || 1));
+  var w = parseFloat(kgEl.value); if (isNaN(w)) w = START;
+
+  var g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#0A0F14'); g.addColorStop(.5, '#0C1614'); g.addColorStop(1, '#0A0F14');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+  var rg = ctx.createRadialGradient(540, 560, 0, 540, 560, 760);
+  rg.addColorStop(0, 'rgba(63,185,80,.15)'); rg.addColorStop(1, 'rgba(63,185,80,0)');
+  ctx.fillStyle = rg; ctx.fillRect(0, 0, W, 1320);
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#5C7A6B'; ctx.font = font(30, 600);
+  ctx.fillText('28 天公开打卡 · 112 → 106 斤', 540, 142);
+
+  ctx.fillStyle = '#7EE787'; ctx.font = font(34, 700);
+  ctx.fillText('D A Y', 540, 268);
+
+  ctx.fillStyle = '#3FB950'; ctx.font = font(200, 800);
+  ctx.fillText(String(day).padStart(2, '0'), 540, 486);
+
+  var d = new Date();
+  ctx.fillStyle = '#4A5560'; ctx.font = font(28);
+  ctx.fillText(d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()), 540, 552);
+
+  ctx.fillStyle = '#8B949E'; ctx.font = font(30, 600);
+  ctx.fillText('今晨空腹体重', 540, 712);
+
+  var txt = w.toFixed(1);
+  ctx.font = font(190, 800);
+  var tw = ctx.measureText(txt).width;
+  var x0 = 540 - (tw + 66) / 2;
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#FFFFFF'; ctx.fillText(txt, x0, 906);
+  ctx.fillStyle = '#7EE787'; ctx.font = font(62, 700); ctx.fillText('斤', x0 + tw + 14, 906);
+  ctx.textAlign = 'center';
+
+  var lost = START - w, total = START - GOAL;
+  var pct = Math.max(0, Math.min(1, lost / total));
+  var bx = 130, by = 1076, bw = 820, bh = 24;
+  ctx.fillStyle = '#1B2A22'; rr(bx, by, bw, bh, 12); ctx.fill();
+  if (pct > 0){ ctx.fillStyle = '#3FB950'; rr(bx, by, Math.max(bh, bw * pct), bh, 12); ctx.fill(); }
+
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#8B949E'; ctx.font = font(29, 600); ctx.fillText('已减', bx, by - 34);
+  ctx.fillStyle = '#7EE787'; ctx.font = font(33, 700);
+  ctx.fillText((lost > 0 ? '-' : '+') + Math.abs(lost).toFixed(1) + ' 斤', bx + 72, by - 34);
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#8B949E'; ctx.font = font(29, 600);
+  ctx.fillText('距 106 斤还差 ' + Math.max(0, total - lost).toFixed(1) + ' 斤', bx + bw, by - 34);
+  ctx.textAlign = 'center';
+
+  var items = ['控住饮食，没碰糖饮', '喝水 2L', '快走 20 分钟', '睡够 7 小时'];
+  var y = 1240;
+  for (var i = 0; i < items.length; i++){
+    ctx.fillStyle = '#111A16'; rr(140, y - 40, 800, 86, 14); ctx.fill();
+    ctx.strokeStyle = '#25382D'; ctx.lineWidth = 2; rr(140, y - 40, 800, 86, 14); ctx.stroke();
+    ctx.strokeStyle = '#3FB950'; ctx.lineWidth = 4; rr(180, y - 21, 44, 44, 10); ctx.stroke();
+    ctx.fillStyle = '#C9D1D9'; ctx.font = font(36, 500); ctx.textAlign = 'left';
+    ctx.fillText(items[i], 262, y + 12);
+    ctx.textAlign = 'center';
+    y += 106;
+  }
+
+  ctx.fillStyle = '#7EE787'; ctx.font = font(40, 700);
+  ctx.fillText('今天也没有放弃', 540, 1766);
+  ctx.fillStyle = '#4A5560'; ctx.font = font(27);
+  ctx.fillText('#减脂打卡  #112到106  #每天记录', 540, 1836);
+}
+
+function save(){
+  cv.toBlob(function(b){
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(b);
+    a.download = '打卡-Day' + String(dayEl.value).padStart(2, '0') + '-' + (parseFloat(kgEl.value) || 0).toFixed(1) + '斤.png';
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+  }, 'image/png');
+}
+
+dayEl.addEventListener('input', function(){ localStorage.setItem('pk_day', dayEl.value); draw(); });
+kgEl.addEventListener('input', function(){ localStorage.setItem('pk_kg', kgEl.value); draw(); });
+document.getElementById('dl').addEventListener('click', save);
+document.getElementById('clr').addEventListener('click', function(){
+  localStorage.removeItem('pk_day'); localStorage.removeItem('pk_kg');
+  dayEl.value = 1; kgEl.value = START; draw();
+});
+
+var q = new URLSearchParams(location.search);
+if (q.get('pure')) document.body.classList.add('pure');
+if (q.get('d')) dayEl.value = q.get('d');
+if (q.get('w')) kgEl.value = q.get('w');
+if (!q.get('d') && localStorage.getItem('pk_day')) dayEl.value = localStorage.getItem('pk_day');
+if (!q.get('w') && localStorage.getItem('pk_kg')) kgEl.value = localStorage.getItem('pk_kg');
+draw();
+</script>
+</body>
+</html>
